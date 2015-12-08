@@ -29,6 +29,7 @@ lint:
 
 test:
 	python setup.py test
+	nosetests ./pyrpo/pyrpo.py
 
 test-all:
 	tox
@@ -47,7 +48,7 @@ docs:
 	$(MAKE) -C docs html
 	#open docs/_build/html/index.html
 
-release: clean
+release: dist twine
 	#	 ver=v0.1.1
 	## update HISTORY.txt
 	#    release date
@@ -73,13 +74,14 @@ release: clean
 	## register with pypi
 	#    python setup.py build register
 	## generate a source distribution and upload to pypi
-	python setup.py sdist upload
-	#python setup.py bdist_wheel upload
 
 dist: clean
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
+
+twine:
+	twine upload ./dist/*
 
 docs_rsync_to_local:
 	rsync -avr ./docs/_build/html/ $(_DOCSHTML)/pyrpo
@@ -87,3 +89,16 @@ docs_rsync_to_local:
 docs_rebuild:
 	$(MAKE) docs
 	$(MAKE) docs_rsync_to_local
+
+BROWSERCMD?=$(shell which web)
+BROWSERCMD?=$(shell which x-www-browser)
+BROWSERCMD?=$(shell which open)
+open:
+	$(BROWSERCMD) docs/_build/html/index.html
+	#$(BROWSERCMD) docs/_build/singlehtml/index.html
+
+pull:
+	git pull
+
+push:
+	git push
